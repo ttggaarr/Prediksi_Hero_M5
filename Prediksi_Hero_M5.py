@@ -1,6 +1,7 @@
 import os
 import pickle
 import streamlit as st
+from sklearn.preprocessing import LabelEncoder
 
 # Memuat model
 model_path = 'prediksi_.sav'
