@@ -2,7 +2,11 @@ import pickle
 import streamlit as st
 
 # Memuat model
-model = pickle.load(open('prediksi.sav', 'rb'))
+try:
+    model = pickle.load(open('prediksi.sav', 'rb'))
+except FileNotFoundError:
+    st.error("File model 'prediksi.sav' tidak ditemukan.")
+    st.stop()
 
 # Data nama hero dan kode hero
 hero_data = {
@@ -144,19 +148,21 @@ RS_Picked = st.sidebar.text_input('RS Pick', help="Masukkan jumlah pick di Ranki
 T_Banned = st.sidebar.text_input('T Ban', help="Masukkan total ban untuk hero ini")
 T_PicksBans = st.sidebar.text_input('Total Pick Ban', help="Masukkan total pick dan ban untuk hero ini")
 
-prediksi_tim = ''
-
 if st.sidebar.button('Submit'):
     try:
         # Ambil kode hero dari nama hero
         Hero_Encoded = hero_data[Hero_Encoded]
         
-        # Konversi input lainnya menjadi float
-        T_Picked = float(T_Picked)
-        BS_Picked = float(BS_Picked)
-        RS_Picked = float(RS_Picked)
-        T_Banned = float(T_Banned)
-        T_PicksBans = float(T_PicksBans)
+        # Validasi dan konversi input lainnya menjadi float
+        try:
+            T_Picked = float(T_Picked)
+            BS_Picked = float(BS_Picked)
+            RS_Picked = float(RS_Picked)
+            T_Banned = float(T_Banned)
+            T_PicksBans = float(T_PicksBans)
+        except ValueError:
+            st.error('Harap masukkan nilai numerik yang valid.')
+            st.stop()
         
         # Lakukan prediksi
         MSE = model.predict([[Hero_Encoded, T_Picked, BS_Picked, RS_Picked, T_Banned, T_PicksBans]])
@@ -170,8 +176,8 @@ if st.sidebar.button('Submit'):
         Hasil prediksi menunjukkan estimasi performa M5 berdasarkan parameter-parameter yang telah dimasukkan.
         Nilai prediksi ini dapat digunakan untuk memahami potensi performa hero dalam pertandingan mendatang.
         """)
-    except ValueError:
-        st.error('Harap masukkan nilai numerik yang valid.')
+    except KeyError:
+        st.error('Hero yang dipilih tidak ditemukan dalam data.')
     except Exception as e:
         st.error(f'Error: {str(e)}')
 
