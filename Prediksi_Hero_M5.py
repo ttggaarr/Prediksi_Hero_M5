@@ -2,7 +2,7 @@ import pickle
 import streamlit as st
 
 # Memuat model
-model = pickle.load(open('prediksi_tim.sav', 'rb'))
+model = pickle.load(open('prediksi_.sav', 'rb'))
 
 # Data nama hero dan kode hero
 hero_data = {
